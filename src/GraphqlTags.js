@@ -55,6 +55,9 @@ export const ADD_MEETING = gql`
     ) {
       id
       title
+      date
+      startTime
+      endTime
     }
   }
 `

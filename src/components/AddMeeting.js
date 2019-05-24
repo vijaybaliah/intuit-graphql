@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Query, Mutation } from 'react-apollo'
-import { MEETING_ROOM_LIST, ADD_MEETING } from '../GraphqlTags'
+import { MEETING_ROOM_LIST, ADD_MEETING, MEETING } from '../GraphqlTags'
 import { withStyles } from '@material-ui/core/styles'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
@@ -99,6 +99,13 @@ class AddMeeting extends Component {
     this.setState({ open: false })
   }
 
+  updateStore = (store, data) => {
+    const meetings = store.readQuery({ query: MEETING })
+    meetings.push(data.Meeting)
+    store.writeQuery({ query: MEETING, meetings })
+    this.props.history.push('/')
+  }
+
   render() {
     const { classes, match: { params } } = this.props
     const { date, startTime, endTime, title, open, availabeRooms, meetingRooms } = this.state
@@ -119,7 +126,11 @@ class AddMeeting extends Component {
                     <Mutation
                       mutation={ADD_MEETING}
                       variables={{...room}}
-                      onCompleted={this.handleCloseModal}>
+                      onCompleted={this.handleCloseModal}
+                      update={
+                        (store, { data }) => this.updateStore(store, data)
+                      }
+                    >
                     {
                       (submitForm, {loading, error}) => {
                         return(
